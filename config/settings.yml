@@ -1,0 +1,12 @@
+---
+Plakboek.uploadDirectory: plakboek/
+Plakboek.keepOriginal: 1
+Plakboek.thumbnails:
+    - thumbName: small
+      resizeMethod: normal
+      width: 150
+      height: 150
+    - thumbName: medium
+      resizeMethod: adaptive
+      width: 200
+      height: 300
