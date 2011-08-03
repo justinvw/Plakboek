@@ -33,6 +33,7 @@ CREATE TABLE IF NOT EXISTS `plakboek_items` (
   `date_published` date NOT NULL,
   `status` tinyint(1) NOT NULL DEFAULT '0',
   `category_id` int(11) NOT NULL,
+  `thumbnail_picture_id` int(11) NOT NULL,
   `updated` datetime NOT NULL,
   `created` datetime NOT NULL,
   PRIMARY KEY (`id`),

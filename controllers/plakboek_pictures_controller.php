@@ -1,7 +1,7 @@
 <?php
 class PlakboekPicturesController extends PlakboekAppController {
     var $name = 'PlakboekPictures';
-	var $uses = array('Plakboek.PlakboekPicture');
+	var $uses = array('Plakboek.PlakboekPicture', 'Plakboek.PlakboekItem');
 	
 	function admin_index($item_id = null){
 	    $pictures = $this->PlakboekPicture->find('all', array(
@@ -47,6 +47,18 @@ class PlakboekPicturesController extends PlakboekAppController {
 		$this->data['PlakboekPicture']['item_id'] = $this->params['url']['item_id'];
 		$this->data['PlakboekPicture']['user_id'] = $this->Session->read('Auth.User.id');
 		$this->PlakboekPicture->save($this->data);
+		
+		// If there is no thumbnail picture assigned to the item, use this picture as thumbnail
+		$item = $this->PlakboekItem->find('first', array(
+			'conditions' => array(
+				'PlakboekItem.id' => $this->params['url']['item_id'],
+				'PlakboekItem.thumbnail_picture_id' => 0
+			)
+		));
+		if($item){
+			$this->PlakboekItem->id = $this->params['url']['item_id'];
+			$this->PlakboekItem->saveField('thumbnail_picture_id', $this->PlakboekPicture->id);
+		}
 		
 		foreach(Configure::read('Plakboek.thumbnails') as $thumbnail){
 		    $thumbnailFilename = String::uuid().'.'.$uploadInfo['extension'];
@@ -101,6 +113,15 @@ class PlakboekPicturesController extends PlakboekAppController {
 	    if($this->PlakboekPicture->delete($id, true)){
 	        foreach($picture['PlakboekFile'] as $imageFile){
 	            unlink(WWW_ROOT.Configure::read('Plakboek.uploadDirectory').$imageFile['filename']);
+	        }
+	        
+	        // Check if this pictures served as a thumbnail for the item,
+	        // if so, set the first picture that belongs to the item as the
+	        // item's thumbnail.
+	        $item = $this->PlakboekItem->findByThumbnailPictureId($id);
+	        if($item){
+	            $this->PlakboekItem->id = $item['PlakboekItem']['id'];
+				$this->PlakboekItem->saveField('thumbnail_picture_id', $item['PlakboekPicture'][0]['id']);
 	        }
 	    }
 	}

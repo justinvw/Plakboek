@@ -42,7 +42,12 @@ class PlakboekItem extends PlakboekAppModel {
 	    'PlakboekCategory' => array(
 	        'className' => 'Plakboek.PlakboekCategory',
 	        'foreignKey' => 'category_id'
-	    )
+	    ),
+	    'PlakboekThumbnail' => array(
+			'className' => 'Plakboek.PlakboekPicture',
+			'foreignKey' => 'thumbnail_picture_id',
+			'dependent' => false
+		)
 	);
 }
 ?>
