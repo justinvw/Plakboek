@@ -3,6 +3,11 @@ class PlakboekItemsController extends PlakboekAppController {
     var $name = 'PlakboekItems';
 	var $uses = array('Plakboek.PlakboekItem');
     
+    function index(){
+        $types = $this->PlakboekItem->PlakboekType->find('list', array('fields' => 'type'));
+        
+    }
+    
     function admin_index(){
         $this->set('title_for_layout', sprintf(__('Items', true)));
 	    
