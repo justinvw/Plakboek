@@ -80,9 +80,13 @@ class PlakboekItemsController extends PlakboekAppController {
                 ));
             }
             
+            $items_by_year_month = array();
             foreach($items as $itemKey => $item) {
     			$items[$itemKey]['PlakboekThumbnail']['PlakboekFile'] = Set::combine($item['PlakboekThumbnail']['PlakboekFile'], '{n}.thumbname', '{n}');
+    			$items_by_year_month[date('Y-m', strtotime($item['PlakboekItem']['date_published'])).'-01'][$itemKey] = $item;
     		}
+    		
+    		$items = $items_by_year_month;
         }
         else {
             $available_items = array();
