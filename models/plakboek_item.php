@@ -87,5 +87,69 @@ class PlakboekItem extends PlakboekAppModel {
 	    
 	    return $item_count_per_year_month;
 	}
+	
+	function itemCountPerYearPerMonthConditional($conditions = array()){
+	    if(array_key_exists('types', $conditions)){
+	        $types = $this->PlakboekItemsType->find('list', array(
+                'fields' => array('item_id'),
+                'conditions' => array('PlakboekItemsType.type_id' => $conditions['types'])
+            ));
+            
+            if(!$types){
+                return array();
+            }
+	    }
+
+	    $applicable_conditions = array();
+	    if(isset($types)){
+	        $applicable_conditions['PlakboekItem.id'] = $types;
+	    }
+	    
+	    if(array_key_exists('start_date', $conditions)){
+	        $applicable_conditions['PlakboekItem.date_published <='] = $conditions['start_date'];
+	    }
+	    
+	    $this->unbindModel(array(
+				'hasMany' => array('PlakboekPicture'),
+				'belongsTo' => array('PlakboekThumbnail', 'PlakboekCategory'),
+			), true
+		);
+        
+	    $item_count = $this->find('all', array(
+	        'fields' => array('YEAR(PlakboekItem.date_published) AS `year`', 'MONTH(PlakboekItem.date_published) AS `month`', 'COUNT(id) AS `count`'),
+	        'conditions' => $applicable_conditions,
+	        'group' => 'YEAR(PlakboekItem.date_published), MONTH(PlakboekItem.date_published)',
+	        'order' => 'PlakboekItem.date_published'
+	    ));
+	    
+	    if(count($item_count) > 0){
+	        if($item_count[0][0]['year']){
+    	        $first_item_count = $item_count[0][0];
+    	    }
+    	    else{
+    	        $first_item_count = $item_count[1][0];
+    	    }
+	    
+    	    end($item_count);
+    	    $last_item_count = $item_count[key($item_count)][0];
+    	    reset($item_count);
+	    	
+	    	$item_count_per_year_month = array();
+    	    foreach($item_count as $item){
+    	        if($item[0]['year']){
+    	            $item_count_per_year_month[$item[0]['year'].'-'.$item[0]['month'].'-01'] = $item[0]['count'];
+    	        }
+    	    }
+	    		    	
+    	    return array(
+    	        'first' => $first_item_count,
+    	        'last' => $last_item_count,
+    	        'overview' => array_reverse($item_count_per_year_month, true)
+    	    );
+    	}
+    	else {
+    	    return array();
+    	}
+	}
 }
 ?>

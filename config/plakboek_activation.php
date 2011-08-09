@@ -19,6 +19,8 @@ class PlakboekActivation {
 		$controller->Croogo->addAco('PlakboekCategories/admin_delete');
 		
 	    $controller->Croogo->addAco('PlakboekItems');
+	    $controller->Croogo->addAco('PlakboekItems/index');
+	    $controller->Croogo->addAco('PlakboekItems/index_items');
 	    $controller->Croogo->addAco('PlakboekItems/admin_index');
 	    $controller->Croogo->addAco('PlakboekItems/admin_add');
 	    $controller->Croogo->addAco('PlakboekItems/admin_edit');

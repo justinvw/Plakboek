@@ -10,6 +10,88 @@ class PlakboekItemsController extends PlakboekAppController {
         $this->set(compact('types', 'item_count'));
     }
     
+    function index_items(){
+        $rows_per_page = 7;
+                
+        if(!array_key_exists('start_date', $this->params['url'])){
+            $this->params['url']['start_date'] = date('Y-m-d');
+        }
+        $this->set('start_date', $this->params['url']['start_date']);
+        
+        if(!array_key_exists('position', $this->params['url'])){
+            $this->params['url']['position'] = $this->params['url']['start_date'];
+        }
+        $this->set('position', $this->params['url']['position']);
+                
+        if(!array_key_exists('types', $this->params['url'])){
+            $this->params['url']['types'] = array();
+        }
+        
+        if($this->params['url']['types']){
+            $available_items = $this->PlakboekItem->itemCountPerYearPerMonthConditional(array(
+                'types' => $this->params['url']['types'], 
+                'start_date' => $this->params['url']['start_date']
+            ));
+        }
+        else{
+            $available_items = $this->PlakboekItem->itemCountPerYearPerMonthConditional(array(
+                'start_date' => $this->params['url']['start_date']
+            ));
+        }
+        
+        if($available_items){
+            $this->PlakboekItem->recursive = 2;
+    		$this->PlakboekItem->unbindModel(array(
+    			    'hasMany' => array('PlakboekPicture'),
+    			), true
+    		);
+    		
+    		if($this->params['url']['types']){
+    		    $filtered_items = $this->PlakboekItem->PlakboekItemsType->find('list', array(
+                    'fields' => array('item_id'),
+                    'conditions' => array('PlakboekItemsType.type_id' => $this->params['url']['types'])
+                ));
+		    }
+		    		    
+    		if(count($available_items['overview']) > 7){
+    		    $last = array_keys($available_items['overview']);
+    		    $last = $last[6];
+    		    $date_restrictions = array($last, $this->params['url']['position']);
+    		}
+    		else {
+    		    $date_restrictions = array($available_items['last']['year'].'-'.$available_items['last']['month'].'-1', $position);
+    		}
+    		
+    		if(isset($filtered_items)){
+                $items = $this->PlakboekItem->find('all', array(
+                    'conditions' => array(
+                        'PlakboekItem.date_published BETWEEN ? AND ?' => $date_restrictions,
+                        'PlakboekItem.id' => $filtered_items
+                    ),
+                    'order' => array('PlakboekItem.date_published DESC')
+                ));
+            }
+            else {
+                $items = $this->PlakboekItem->find('all', array(
+                    'conditions' => array(
+                        'PlakboekItem.date_published BETWEEN ? AND ?' => $date_restrictions,
+                    ),
+                    'order' => array('PlakboekItem.date_published DESC')
+                ));
+            }
+            
+            foreach($items as $itemKey => $item) {
+    			$items[$itemKey]['PlakboekThumbnail']['PlakboekFile'] = Set::combine($item['PlakboekThumbnail']['PlakboekFile'], '{n}.thumbname', '{n}');
+    		}
+        }
+        else {
+            $available_items = array();
+            $items = array();
+        }
+        
+        $this->set(compact('items', 'available_items'));
+    }
+    
     function admin_index(){
         $this->set('title_for_layout', sprintf(__('Items', true)));
 	    
@@ -17,7 +99,7 @@ class PlakboekItemsController extends PlakboekAppController {
 	    
 	    $this->set(compact('items'));
     }
-    
+        
     function admin_add(){
         $this->set('title_for_layout', sprintf(__('Add Item', true)));
         
