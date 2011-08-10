@@ -83,7 +83,7 @@ class PlakboekItemsController extends PlakboekAppController {
             $items_by_year_month = array();
             foreach($items as $itemKey => $item) {
     			$items[$itemKey]['PlakboekThumbnail']['PlakboekFile'] = Set::combine($item['PlakboekThumbnail']['PlakboekFile'], '{n}.thumbname', '{n}');
-    			$items_by_year_month[date('Y-m', strtotime($item['PlakboekItem']['date_published'])).'-01'][$itemKey] = $item;
+    			$items_by_year_month[date('Y-m', strtotime($item['PlakboekItem']['date_published'])).'-01'][$itemKey] = $items[$itemKey];
     		}
     		
     		$items = $items_by_year_month;
@@ -93,7 +93,7 @@ class PlakboekItemsController extends PlakboekAppController {
             $items = array();
         }
         
-        $this->set(compact('items', 'available_items'));
+        $this->set(compact('items', 'available_items', 'rows_per_page'));
     }
     
     function admin_index(){
