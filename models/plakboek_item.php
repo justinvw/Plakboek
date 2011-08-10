@@ -51,7 +51,7 @@ class PlakboekItem extends PlakboekAppModel {
 	);
 	
 	function itemCountPerYearPerMonth(){
-	    $item_count = $this->query("SELECT YEAR(`date_published`) AS `year`, MONTH(`date_published`) AS `month`, COUNT(*) as `count` FROM `plakboek_items` AS `PlakboekItem` GROUP BY YEAR(`date_published`), MONTH(`date_published`) ORDER BY YEAR(`date_published`), MONTH(`date_published`)");
+	    $item_count = $this->query("SELECT YEAR(`date_published`) AS `year`, DATE_FORMAT(`date_published`, '%m') AS `month`, COUNT(*) as `count` FROM `plakboek_items` AS `PlakboekItem` GROUP BY YEAR(`date_published`), MONTH(`date_published`) ORDER BY YEAR(`date_published`), MONTH(`date_published`)");
 	    
 	    if($item_count[0][0]['year']){
 	        $first_item_count = $item_count[0][0];
@@ -116,7 +116,7 @@ class PlakboekItem extends PlakboekAppModel {
 		);
         
 	    $item_count = $this->find('all', array(
-	        'fields' => array('YEAR(PlakboekItem.date_published) AS `year`', 'MONTH(PlakboekItem.date_published) AS `month`', 'COUNT(id) AS `count`'),
+	        'fields' => array('YEAR(PlakboekItem.date_published) AS `year`', 'DATE_FORMAT(PlakboekItem.date_published, \'%m\') AS `month`', 'COUNT(id) AS `count`'),
 	        'conditions' => $applicable_conditions,
 	        'group' => 'YEAR(PlakboekItem.date_published), MONTH(PlakboekItem.date_published)',
 	        'order' => 'PlakboekItem.date_published'
