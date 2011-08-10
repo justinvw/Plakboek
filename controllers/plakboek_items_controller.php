@@ -53,15 +53,28 @@ class PlakboekItemsController extends PlakboekAppController {
                 ));
 		    }
 		    		    
-    		if(count($available_items['overview']) > 7){
-    		    $last = array_keys($available_items['overview']);
-    		    $last = $last[6];
+    		if(count($available_items['overview']) > $rows_per_page){
+    		    $available_dates = array_keys($available_items['overview']);
+    		    $items_left = (count($available_dates) - 1) - array_search($this->params['url']['position'], $available_dates);
+    		    
+    		    debug($available_dates);
+    		    debug($items_left);
+    		    
+    		    if($items_left >= $rows_per_page){
+    		        $last = $available_dates[array_search($this->params['url']['position'], $available_dates) + ($rows_per_page-1)];
+    		    }
+    		    else{
+    		        $last = end($available_dates);
+    		    }
+    		    debug($last);
+    		    //$last = $available_dates[$rows_per_page - 1];
     		    $date_restrictions = array($last, $this->params['url']['position']);
     		}
     		else {
-    		    $date_restrictions = array($available_items['last']['year'].'-'.$available_items['last']['month'].'-1', $position);
+    		    $date_restrictions = array($available_items['last']['year'].'-'.$available_items['last']['month'].'-01', $position);
     		}
-    		
+    		debug($date_restrictions);
+    		$date_restrictions[1] = substr($date_restrictions[1], 0, -2).'31';
     		if(isset($filtered_items)){
                 $items = $this->PlakboekItem->find('all', array(
                     'conditions' => array(
