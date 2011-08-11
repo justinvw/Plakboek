@@ -57,23 +57,19 @@ class PlakboekItemsController extends PlakboekAppController {
     		    $available_dates = array_keys($available_items['overview']);
     		    $items_left = (count($available_dates) - 1) - array_search($this->params['url']['position'], $available_dates);
     		    
-    		    debug($available_dates);
-    		    debug($items_left);
-    		    
     		    if($items_left >= $rows_per_page){
     		        $last = $available_dates[array_search($this->params['url']['position'], $available_dates) + ($rows_per_page-1)];
     		    }
     		    else{
     		        $last = end($available_dates);
     		    }
-    		    debug($last);
-    		    //$last = $available_dates[$rows_per_page - 1];
+                
     		    $date_restrictions = array($last, $this->params['url']['position']);
     		}
     		else {
     		    $date_restrictions = array($available_items['last']['year'].'-'.$available_items['last']['month'].'-01', $position);
     		}
-    		debug($date_restrictions);
+            
     		$date_restrictions[1] = substr($date_restrictions[1], 0, -2).'31';
     		if(isset($filtered_items)){
                 $items = $this->PlakboekItem->find('all', array(
@@ -107,6 +103,22 @@ class PlakboekItemsController extends PlakboekAppController {
         }
         
         $this->set(compact('items', 'available_items', 'rows_per_page'));
+    }
+    
+    function view(){
+        $item = $this->PlakboekItem->findBySlug($this->params['slug']);
+        if($this->RequestHandler->isAjax()) {
+            $this->set(compact('item'));
+            $this->render('a_view');
+		}
+		else {
+		    if(!$item){
+		        $this->Session->setFlash(__('Invalid content', true));
+			    $this->redirect(array('controller' => 'plakboek_items', 'action' => 'index'));
+			}
+			
+			$this->set(compact('item'));
+		}
     }
     
     function admin_index(){
