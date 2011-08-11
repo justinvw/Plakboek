@@ -7,6 +7,10 @@ Plakboek.thumbnails:
       width: 150
       height: 150
     - thumbName: medium
+      resizeMethod: normal
+      width: 900
+      height: 2000
+    - thumbName: album_index
       resizeMethod: adaptive
-      width: 200
+      width: 300
       height: 300
