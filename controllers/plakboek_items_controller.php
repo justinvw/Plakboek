@@ -27,15 +27,29 @@ class PlakboekItemsController extends PlakboekAppController {
             $this->params['url']['types'] = array();
         }
         
+        if(!array_key_exists('query', $this->params['url'])){
+            $this->params['url']['query'] = '';
+        }
+        
         if($this->params['url']['types']){
             $available_items = $this->PlakboekItem->itemCountPerYearPerMonthConditional(array(
                 'types' => $this->params['url']['types'], 
-                'start_date' => $this->params['url']['start_date']
+                'start_date' => $this->params['url']['start_date'],
+                'OR' => array(
+                    'title LIKE' => '%'.$this->params['url']['query'].'%',
+                    'excerpt LIKE' => '%'.$this->params['url']['query'].'%',
+                    'description LIKE' => '%'.$this->params['url']['query'].'%',
+                )
             ));
         }
         else{
             $available_items = $this->PlakboekItem->itemCountPerYearPerMonthConditional(array(
-                'start_date' => $this->params['url']['start_date']
+                'start_date' => $this->params['url']['start_date'],
+                'OR' => array(
+                    'title LIKE' => '%'.$this->params['url']['query'].'%',
+                    'excerpt LIKE' => '%'.$this->params['url']['query'].'%',
+                    'description LIKE' => '%'.$this->params['url']['query'].'%',
+                )
             ));
         }
         
@@ -75,7 +89,12 @@ class PlakboekItemsController extends PlakboekAppController {
                 $items = $this->PlakboekItem->find('all', array(
                     'conditions' => array(
                         'PlakboekItem.date_published BETWEEN ? AND ?' => $date_restrictions,
-                        'PlakboekItem.id' => $filtered_items
+                        'PlakboekItem.id' => $filtered_items,
+                        'OR' => array(
+                            'PlakboekItem.title LIKE' => '%'.$this->params['url']['query'].'%',
+                            'PlakboekItem.excerpt LIKE' => '%'.$this->params['url']['query'].'%',
+                            'PlakboekItem.description LIKE' => '%'.$this->params['url']['query'].'%',
+                        ),
                     ),
                     'order' => array('PlakboekItem.date_published DESC')
                 ));
@@ -84,6 +103,11 @@ class PlakboekItemsController extends PlakboekAppController {
                 $items = $this->PlakboekItem->find('all', array(
                     'conditions' => array(
                         'PlakboekItem.date_published BETWEEN ? AND ?' => $date_restrictions,
+                        'OR' => array(
+                            'PlakboekItem.title LIKE' => '%'.$this->params['url']['query'].'%',
+                            'PlakboekItem.excerpt LIKE' => '%'.$this->params['url']['query'].'%',
+                            'PlakboekItem.description LIKE' => '%'.$this->params['url']['query'].'%',
+                        ),
                     ),
                     'order' => array('PlakboekItem.date_published DESC')
                 ));
