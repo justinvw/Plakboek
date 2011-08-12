@@ -109,6 +109,10 @@ class PlakboekItem extends PlakboekAppModel {
 	        $applicable_conditions['PlakboekItem.date_published <='] = $conditions['start_date'];
 	    }
 	    
+	    if(array_key_exists('query', $conditions)){
+	        $applicable_conditions['OR'] = $conditions['query'];
+	    }
+	    
 	    $this->unbindModel(array(
 				'hasMany' => array('PlakboekPicture'),
 				'belongsTo' => array('PlakboekThumbnail', 'PlakboekCategory'),

@@ -11,7 +11,7 @@ class PlakboekItemsController extends PlakboekAppController {
     }
     
     function index_items(){
-        $rows_per_page = 7;
+        $rows_per_page = 5;
                 
         if(!array_key_exists('start_date', $this->params['url'])){
             $this->params['url']['start_date'] = date('Y-m-d');
@@ -35,21 +35,21 @@ class PlakboekItemsController extends PlakboekAppController {
             $available_items = $this->PlakboekItem->itemCountPerYearPerMonthConditional(array(
                 'types' => $this->params['url']['types'], 
                 'start_date' => $this->params['url']['start_date'],
-                'OR' => array(
+                'query'=> array('OR' => array(
                     'title LIKE' => '%'.$this->params['url']['query'].'%',
                     'excerpt LIKE' => '%'.$this->params['url']['query'].'%',
                     'description LIKE' => '%'.$this->params['url']['query'].'%',
-                )
+                ))
             ));
         }
         else{
             $available_items = $this->PlakboekItem->itemCountPerYearPerMonthConditional(array(
                 'start_date' => $this->params['url']['start_date'],
-                'OR' => array(
+                'query'=> array('OR' => array(
                     'title LIKE' => '%'.$this->params['url']['query'].'%',
                     'excerpt LIKE' => '%'.$this->params['url']['query'].'%',
                     'description LIKE' => '%'.$this->params['url']['query'].'%',
-                )
+                ))
             ));
         }
         
@@ -81,10 +81,11 @@ class PlakboekItemsController extends PlakboekAppController {
     		    $date_restrictions = array($last, $this->params['url']['position']);
     		}
     		else {
-    		    $date_restrictions = array($available_items['last']['year'].'-'.$available_items['last']['month'].'-01', $position);
+    		    $date_restrictions = array($available_items['first']['year'].'-'.$available_items['first']['month'].'-01', $available_items['last']['year'].'-'.$available_items['last']['month'].'-01');
     		}
-            
+
     		$date_restrictions[1] = substr($date_restrictions[1], 0, -2).'31';
+    		
     		if(isset($filtered_items)){
                 $items = $this->PlakboekItem->find('all', array(
                     'conditions' => array(
