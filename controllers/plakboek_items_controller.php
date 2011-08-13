@@ -6,8 +6,9 @@ class PlakboekItemsController extends PlakboekAppController {
     function index(){
         $types = $this->PlakboekItem->PlakboekType->find('list', array('fields' => 'type'));
         $item_count = $this->PlakboekItem->itemCountPerYearPerMonth();
+        $total_itms = array_sum($item_count);
         
-        $this->set(compact('types', 'item_count'));
+        $this->set(compact('types', 'item_count', 'total_items'));
     }
     
     function index_items(){
@@ -17,7 +18,7 @@ class PlakboekItemsController extends PlakboekAppController {
             $this->params['url']['start_date'] = date('Y-m-d');
         }
         else {
-            $this->params['url']['start_date']= substr($this->params['url']['start_date'], 0, -2).'31';
+            $this->params['url']['start_date'] = substr($this->params['url']['start_date'], 0, -2).'31';
         }
         $this->set('start_date', $this->params['url']['start_date']);
         
