@@ -16,6 +16,9 @@ class PlakboekItemsController extends PlakboekAppController {
         if(!array_key_exists('start_date', $this->params['url'])){
             $this->params['url']['start_date'] = date('Y-m-d');
         }
+        else {
+            $this->params['url']['start_date']= substr($this->params['url']['start_date'], 0, -2).'31';
+        }
         $this->set('start_date', $this->params['url']['start_date']);
         
         if(!array_key_exists('position', $this->params['url'])){
@@ -131,7 +134,13 @@ class PlakboekItemsController extends PlakboekAppController {
     }
     
     function view(){
+        $this->PlakboekItem->unbindModel(array('belongsTo' => array('PlakboekThumbnail')));
+        $this->PlakboekItem->recursive = 2;
         $item = $this->PlakboekItem->findBySlug($this->params['slug']);
+        foreach($item['PlakboekPicture'] as $pictureKey => $picture){
+            $item['PlakboekPicture'][$pictureKey]['PlakboekFile'] = Set::combine($picture['PlakboekFile'], '{n}.thumbname', '{n}');
+        }
+		
         if($this->RequestHandler->isAjax()) {
             $this->set(compact('item'));
             $this->render('a_view');
