@@ -6,7 +6,7 @@ class PlakboekItemsController extends PlakboekAppController {
     function index(){
         $types = $this->PlakboekItem->PlakboekType->find('list', array('fields' => 'type'));
         $item_count = $this->PlakboekItem->itemCountPerYearPerMonth();
-        $total_itms = array_sum($item_count);
+        $total_items = array_sum($item_count);
         
         $this->set(compact('types', 'item_count', 'total_items'));
     }
